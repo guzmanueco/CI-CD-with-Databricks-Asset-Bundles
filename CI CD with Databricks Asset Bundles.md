@@ -449,3 +449,55 @@ This lesson shows how to automate the bundle runs through a Github pipeline.
 Within our project folder, we are creating a new folder `.github/` and within yet another `workflows`.
 
 Finally, within `.github/workflows/` we create `cicd.yml`
+
+This workflow will deplo the jobs, and then run them. It will use databricks token that needs to be stored in Github -> Repo -> Settings -> Environment.
+
+This is how it should look:
+```yml
+# name of your workflow
+name: "DEV deployment"
+
+# number of allowed concurrent executions
+concurrency: "1"
+
+# event trigering the workflow
+# this will trigger the pipeline on pishing changes
+on: [push]
+
+# jobs to be executed on action
+jobs:
+  deploy:
+    name: "Deploy bundle to DEV"
+    runs-on: ubuntu-latest # environment to be used when executing the workflow
+    environment: dev # environment name shown in github ui
+
+    steps:
+      - uses: actions/checkout@v5 # checksout the code from github
+
+      - uses: databricks/setup-cli@main # installing db cli
+      
+      - uses: databricks bundle deploy # we run the job
+        working-directory: ./dab # setting the folder containing the bundle
+        env:
+          DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
+          DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
+
+  run_pipeline_update:
+    name: "Deploy bundle to DEV"
+    runs-on: ubuntu-latest # environment to be used when executing the workflow
+    environment: dev # environment name shown in github ui
+
+    needs:
+      - deploy # sets the dependency to the previous job
+
+    steps:
+      - uses: actions/checkout@v5 # checksout the code from github
+
+      - uses: databricks/setup-cli@main # installing db cli
+      
+      - uses: databricks bundle run job_1 --refresh-all # we run the job
+        working-directory: ./dab # setting the folder containing the bundle
+        env:
+          DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
+          DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
+```

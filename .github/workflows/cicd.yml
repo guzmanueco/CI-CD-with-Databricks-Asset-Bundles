@@ -21,7 +21,7 @@ jobs:
       - uses: databricks/setup-cli@main # installing db cli
       
       - uses: databricks bundle deploy # we run the job
-        working_directory: ./dab # setting the folder containing the bundle
+        working-directory: ./init_project/dab # setting the folder containing the bundle
         env:
           DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
           DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
@@ -40,7 +40,7 @@ jobs:
       - uses: databricks/setup-cli@main # installing db cli
       
       - uses: databricks bundle run job_1 --refresh-all # we run the job
-        working_directory: ./dab # setting the folder containing the bundle
+        working-directory: ./init_project/dab # setting the folder containing the bundle
         env:
           DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
           DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
