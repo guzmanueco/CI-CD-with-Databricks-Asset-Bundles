@@ -1,0 +1,17 @@
+name: "DEV deployment"
+
+concurrency: "1"
+
+on: [push]
+
+jobs:
+  deploy:
+    name: "Deploy bundle to DEV"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g bats
+      - run: bats -v

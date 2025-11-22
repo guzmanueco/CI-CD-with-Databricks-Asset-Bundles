@@ -1,0 +1,54 @@
+# A sample job for init_project.
+
+resources:
+  jobs:
+    job_1:
+      name: job_1
+
+      trigger:
+        # Run this job every day, exactly one day from the last run; see https://docs.databricks.com/api/workspace/jobs/create#trigger
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      #email_notifications:
+      #  on_failure:
+      #    - your_email@example.com
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: notebook_task_1
+          notebook_task:
+            notebook_path: ${var.dab_notebook}
+        - task_key: notebook_task_2
+          notebook_task:
+            notebook_path: ../src/sample_notebook_2.ipynb
+            base_parameters:
+              notebook_param: "my_param"
+        - task_key: job_1_notebook_task_3
+          depends_on:
+            - task_key: notebook_task_1
+            - task_key: notebook_task_2
+          run_if: ALL_DONE
+          notebook_task:
+            notebook_path: ../src/sample_notebook_3.ipynb
+            base_parameters:
+              from_t2: "{{tasks.notebook_task_2.values.from_t2}}"
+        - task_key: job_2_trigger
+          depends_on: 
+            - task_key: job_1_notebook_task_3
+          run_if: ALL_DONE
+          run_job_task:
+            job_id: ${resources.jobs.job_2.id}
+            job_parameters:
+              job_param: "{{tasks.job_1_notebook_task_3.values.job_param}}"
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
