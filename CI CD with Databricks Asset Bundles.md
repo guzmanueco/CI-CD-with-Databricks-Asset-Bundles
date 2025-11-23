@@ -503,10 +503,9 @@ jobs:
 ```
 
 ### Implementing a "pull request" pipeline
-Simple edit the previous code to use a "pll request" trigger:
+Thi will basically be the same, but we need to change the `cicd.yml` file to use the correct configuration on the trigger action:
 ```yml
 # cicd.yml
-
 # name of your workflow
 name: "DEV deployment"
 
@@ -514,10 +513,10 @@ name: "DEV deployment"
 concurrency: "1"
 
 # event trigering the workflow
-# this will trigger the pipeline on pull requests to main
+# this will trigger the pipeline on pull request changes
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
 
 # jobs to be executed on action
 jobs:
@@ -555,9 +554,11 @@ jobs:
         env:
           DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
           DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
+
 ```
 
-Aditionally on Github -> Repo -> Settings -> Branches you need to add a rule set for main. Make sure you check on "Require a pull request before merging" and "Require status checks to pass" (adding all your jobs in this last check).
+After changing this, go back to Github -> Repo -> Settings -> Rulesets  and create a new rule. This is done to add extra security on your PR. Basically we will be setting master as target branch, and activating te options "Require a pull request before merging" and "Require status checks to pass" (add your stages in your yml pipeline in this step so that they are triggered on the PR before merging). This will check the pipeline works BEFORE merging.
 
-Finally, make sure to activate the "Enforcement Status"=Active.
+After this, you are good to go to commit, PR and merge. If set correctly, after the PR and before the merge, the stages added on "Require status checks to pass" will be triggered. If executed correctly, you will be able to merge.
 
+## Implementing CI/CD Azure
