@@ -46,3 +46,4 @@ jobs:
         env:
           DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
           DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
+
