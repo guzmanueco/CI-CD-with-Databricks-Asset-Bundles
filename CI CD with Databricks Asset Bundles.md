@@ -562,3 +562,47 @@ After changing this, go back to Github -> Repo -> Settings -> Rulesets  and crea
 After this, you are good to go to commit, PR and merge. If set correctly, after the PR and before the merge, the stages added on "Require status checks to pass" will be triggered. If executed correctly, you will be able to merge.
 
 ## Implementing CI/CD Azure
+Create a new repo on Azure Devops, clone it to your local and initialize a databricks bundle with `databricks bundle init`.
+
+Then, create an `azure_pipeline.yml` within your project `your_project/` folder with:
+
+```yml
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: 'DatabricksSettings'
+  - nam: SOURCE_DIR
+    value: 'DAB/devops_bundle'
+
+steps:
+# Install Dataricks CLI
+- script: |
+    if ! command -v databricks &> /dev/null; then
+      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh |
+      echo "Databricks CLI instaled"
+  displayName: Databricks CLI Installation
+
+# Run DAB validation
+- script: |
+    databricks bundle validate
+  workingDirectory: $(SOURCE_DIR)
+  displayName: DAB validation
+  # env
+  #   DATABRICKS_HOST: $(DATABRICKS_HOST)
+  #   DATABRICKS_TOKEN: $(DATABRICKS_TOKEN)
+
+- script: |
+    databricks bundle deploy
+  workingDirectory: $(SOURCE_DIR)
+  displayName: DAB Deployment
+  # env
+  #   DATABRICKS_HOST: $(DATABRICKS_HOST)
+  #   DATABRICKS_TOKEN: $(DATABRICKS
+```
+
+Back to your Azure Devops Workspace go to Pipelines -> Library and create a new variable group with name `DatabricksSettings` (matching the name in your azure_pipeline.yml file for the group) and create two variables `DATABRICKS_HOST` and `DATABRICKS_TOKEN` (with your account details).
+
+After this, you can create a new pipeline and select your `azure_pipeline.yml` file.
