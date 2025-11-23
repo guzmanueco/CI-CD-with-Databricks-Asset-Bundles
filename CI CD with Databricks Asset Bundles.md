@@ -560,3 +560,4 @@ jobs:
 Aditionally on Github -> Repo -> Settings -> Branches you need to add a rule set for main. Make sure you check on "Require a pull request before merging" and "Require status checks to pass" (adding all your jobs in this last check).
 
 Finally, make sure to activate the "Enforcement Status"=Active.
+

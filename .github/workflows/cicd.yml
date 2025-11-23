@@ -5,7 +5,7 @@ name: "DEV deployment"
 concurrency: "1"
 
 # event trigering the workflow
-# this will trigger the pipeline on pishing changes
+# this will trigger the pipeline on pull request changes
 on:
   pull_request:
     branches: [main]
