@@ -503,3 +503,60 @@ jobs:
 ```
 
 ### Implementing a "pull request" pipeline
+Simple edit the previous code to use a "pll request" trigger:
+```yml
+# cicd.yml
+
+# name of your workflow
+name: "DEV deployment"
+
+# number of allowed concurrent executions
+concurrency: "1"
+
+# event trigering the workflow
+# this will trigger the pipeline on pull requests to main
+on:
+  pull_request:
+    branches: [main]
+
+# jobs to be executed on action
+jobs:
+  deploy:
+    name: "Deploy bundle to DEV"
+    runs-on: ubuntu-latest # environment to be used when executing the workflow
+    environment: dev # environment name shown in github ui
+
+    steps:
+      - uses: actions/checkout@v5 # checksout the code from github
+
+      - uses: databricks/setup-cli@main # installing db cli
+      
+      - run: databricks bundle deploy # we run the job
+        working-directory: ./init_project/dab # setting the folder containing the bundle
+        env:
+          DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
+          DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
+
+  run_pipeline_update:
+    name: "Run pipeline in DEV"
+    runs-on: ubuntu-latest # environment to be used when executing the workflow
+    environment: dev # environment name shown in github ui
+
+    needs:
+      - deploy # sets the dependency to the previous job
+
+    steps:
+      - uses: actions/checkout@v5 # checksout the code from github
+
+      - uses: databricks/setup-cli@main # installing db cli
+      
+      - run: databricks bundle run job_1 --refresh-all # we run the job
+        working-directory: ./init_project/dab # setting the folder containing the bundle
+        env:
+          DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
+          DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
+```
+
+Aditionally on Github -> Repo -> Settings -> Branches you need to add a rule set for main. Make sure you check on "Require a pull request before merging" and "Require status checks to pass" (adding all your jobs in this last check).
+
+Finally, make sure to activate the "Enforcement Status"=Active.

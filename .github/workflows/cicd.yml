@@ -6,7 +6,9 @@ concurrency: "1"
 
 # event trigering the workflow
 # this will trigger the pipeline on pishing changes
-on: [push]
+on:
+  pull_request:
+    branches: [main]
 
 # jobs to be executed on action
 jobs:
