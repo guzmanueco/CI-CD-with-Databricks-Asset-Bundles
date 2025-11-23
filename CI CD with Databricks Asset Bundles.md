@@ -476,14 +476,14 @@ jobs:
 
       - uses: databricks/setup-cli@main # installing db cli
       
-      - uses: databricks bundle deploy # we run the job
-        working-directory: ./dab # setting the folder containing the bundle
+      - run: databricks bundle deploy # we run the job
+        working-directory: ./init_project/dab # setting the folder containing the bundle
         env:
           DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
           DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
 
   run_pipeline_update:
-    name: "Deploy bundle to DEV"
+    name: "Run pipeline in DEV"
     runs-on: ubuntu-latest # environment to be used when executing the workflow
     environment: dev # environment name shown in github ui
 
@@ -495,9 +495,11 @@ jobs:
 
       - uses: databricks/setup-cli@main # installing db cli
       
-      - uses: databricks bundle run job_1 --refresh-all # we run the job
-        working-directory: ./dab # setting the folder containing the bundle
+      - run: databricks bundle run job_1 --refresh-all # we run the job
+        working-directory: ./init_project/dab # setting the folder containing the bundle
         env:
           DATABRICKS_TOKEN: ${{secrets.SP_TOKEN}} # a tdatabricks token stored in github secrets
           DATABRICKS_BUNDLE_ENV: dev # databricks environment to be used
 ```
+
+### Implementing a "pull request" pipeline
