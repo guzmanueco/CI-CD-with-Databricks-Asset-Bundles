@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "wheel-poetry"
+version = "0.1.0"
+description = "wheel poetry demo"
+authors = ["guzmanueco <guzman.garcia1990@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.scripts]
+main = "wheel_poetry.main:main"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
